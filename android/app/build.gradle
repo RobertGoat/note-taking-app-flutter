@@ -1,0 +1,57 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"  // Apply the Kotlin plugin for Android
+    id 'com.google.gms.google-services'  // Firebase plugin
+    id "dev.flutter.flutter-gradle-plugin"  // Flutter plugin
+}
+
+android {
+    namespace = "com.example.notes_but_better"
+    compileSdk = 34  // Update this to SDK 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId "com.example.notes_but_better"
+        minSdkVersion 23
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+
+        ndk {
+        abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"  // Add this line
+    }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:33.5.0')
+
+    // Add Firebase SDKs
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+
+    // Kotlin standard library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"
+}
+
+// Add the resolution strategy block here to force specific versions
+// configurations.all {
+//     resolutionStrategy {
+//         force 'androidx.browser:browser:1.8.0'  // Force the correct version of the browser library
+//     }
+// }

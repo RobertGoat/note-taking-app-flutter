@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1097523035274",
+    "project_id": "notesbutbetterflutter",
+    "storage_bucket": "notesbutbetterflutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097523035274:android:ec189aeba485af712e8173",
+        "android_client_info": {
+          "package_name": "com.example.notes_but_better"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhToZeXBVLiYAEYab2iCs5nBsoK1iDkE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097523035274:android:3217822f963a848b2e8173",
+        "android_client_info": {
+          "package_name": "com.notesbutbetterflutter.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhToZeXBVLiYAEYab2iCs5nBsoK1iDkE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
