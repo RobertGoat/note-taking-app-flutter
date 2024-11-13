@@ -1,5 +1,6 @@
 // notedetailpages.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notes_but_better/change_notifiers/speechtranslatehelper.dart';
@@ -72,13 +73,18 @@ class _NotedetailpagesState extends State<Notedetailpages> {
     final String newTitle = _titleController.text.trim();
     final String newContent = _contentController.text.trim();
     final int now = DateTime.now().microsecondsSinceEpoch;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
 
     final noteData = {
       'title': newTitle.isNotEmpty ? newTitle : null,
       'content': newContent.isNotEmpty ? newContent : null,
       'dateCreated': widget.isNew ? now : widget.note?.dateCreated,
       'dateModified': now,
+      'userId': userId, // Add userId to the note data
     };
+
+    // Access the instance of NotesProvider via Provider
+    final notesProvider = Provider.of<NotesProvider>(context, listen: false);
 
     if (widget.isNew) {
       // Add a new document to Firestore
@@ -91,6 +97,9 @@ class _NotedetailpagesState extends State<Notedetailpages> {
               ?.id) // Make sure to save the document ID when retrieving notes
           .update(noteData);
     }
+
+    // Refresh the notes list to reflect changes in the UI
+    await notesProvider.fetchNotes();
 
     Navigator.pop(context);
   }

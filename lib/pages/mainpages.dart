@@ -124,29 +124,15 @@ class _MainpagesState extends State<Mainpages> {
           );
         },
       ),
-      body: StreamBuilder<List<Note>>(
-        stream: context.read<NotesProvider>().notesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      body: Consumer<NotesProvider>(
+        builder: (context, notesProvider, _) {
+          final notes = notesProvider.notes;
+
+          if (notes.isEmpty) {
             return EmptyNote();
           } else {
-            final List<Note> notes = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  // NoteSearchBar(),
-                  SizedBox(height: 32),
-                  Expanded(
-                    child: NotesGrid(notes: notes),
-                  ),
-                ],
-              ),
-            );
+            return Container(
+                margin: EdgeInsets.all(16), child: NotesGrid(notes: notes));
           }
         },
       ),

@@ -58,6 +58,7 @@ class NoteCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   note.content!,
+                  maxLines: 4,
                   style: TextStyle(color: gray900),
                 ),
               ),
@@ -125,7 +126,7 @@ class NoteCard extends StatelessWidget {
                                 Navigator.pop(context); // Close the dialog
                                 Provider.of<NotesProvider>(context,
                                         listen: false)
-                                    .deleteNote(note.id);
+                                    .deleteNote(note.id!);
                               },
                               child: Text(
                                 "Delete",

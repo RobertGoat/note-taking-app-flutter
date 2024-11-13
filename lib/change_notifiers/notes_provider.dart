@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_but_better/models/note.dart';
 
@@ -8,56 +9,69 @@ class NotesProvider extends ChangeNotifier {
   List<Note> get notes => [..._notes];
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Stream to listen to Firestore changes
-  Stream<List<Note>> get notesStream {
-    return _firestore.collection('notes').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Note.fromFirestore(doc);
-      }).toList();
-    });
-  }
+  // Stream to listen to Firestore changes for the logged-in user's notes
+  // Stream<List<Note>> get notesStream {
+  //   final userId = FirebaseAuth.instance.currentUser?.uid;
+  //   return _firestore
+  //       .collection('notes')
+  //       .where('userId', isEqualTo: userId)
+  //       .snapshots()
+  //       .map((snapshot) {
+  //     return snapshot.docs.map((doc) {
+  //       return Note.fromFirestore(doc);
+  //     }).toList();
+  //   });
+  // }
 
-  // Add note
-  Future<void> addNoteToFirestore(Note note) async {
-    await _firestore.collection('notes').add(note.toMap());
-  }
-
-  // Update note
-  Future<void> updateNoteInFirestore(Note note) async {
-    await _firestore.collection('notes').doc(note.id).update(note.toMap());
-  }
-
-  // Fetch notes from Firestore
+  // Fetch notes for the logged-in user from Firestore
   Future<void> fetchNotes() async {
-    final notesCollection = FirebaseFirestore.instance.collection('notes');
-    final snapshot = await notesCollection.get();
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final snapshot = await _firestore
+          .collection('notes')
+          .where('userId', isEqualTo: userId)
+          .get();
+      print('userID detchNote = $userId');
 
-    _notes = snapshot.docs.map((doc) {
-      final data = doc.data();
-      return Note(
-        id: doc.id,
-        title: data['title'],
-        content: data['content'],
-        dateCreated: data['dateCreated'],
-        dateModified: data['dateModified'],
-      );
-    }).toList();
+      _notes = snapshot.docs.map((doc) => Note.fromFirestore(doc)).toList();
+      print('Fetched Notes: $_notes'); // Add this line
 
-    notifyListeners(); // Notify UI to update
+      notifyListeners(); // Notifies the UI about the update
+    }
   }
 
-  Future<void> deleteNote(String? noteId) async {
-    try {
-      // Delete note from Firestore
-      await _firestore.collection('notes').doc(noteId).delete();
-
-      // Remove from local list
-      notes.removeWhere((note) => note.id == noteId);
-
-      notifyListeners();
-    } catch (e) {
-      print("Error deleting note: $e");
+  // Add note with userId
+  Future<void> addNoteToFirestore(String title, String content) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final newNoteRef = await _firestore.collection('notes').add({
+        'title': title,
+        'content': content,
+        'userId': userId,
+        'dateCreated': Timestamp.now(),
+        'dateModified': Timestamp.now(),
+      });
+      print('Title = $title, userID = $userId');
+      await fetchNotes(); // Refresh notes after adding a new one
     }
+  }
+
+  // Update a note
+  // Update an existing note
+  Future<void> updateNoteInFirestore(Note updatedNote) async {
+    await _firestore.collection('notes').doc(updatedNote.id).update({
+      'title': updatedNote.title,
+      'content': updatedNote.content,
+      'dateModified': Timestamp.now(),
+    });
+    await fetchNotes(); // Refresh notes after updating
+  }
+
+  // Delete a note
+  Future<void> deleteNote(String noteId) async {
+    await _firestore.collection('notes').doc(noteId).delete();
+    _notes.removeWhere((note) => note.id == noteId);
+    notifyListeners();
   }
 
   void addNote(Note note) {
@@ -66,16 +80,14 @@ class NotesProvider extends ChangeNotifier {
   }
 
   // Update an existing note
-  void updateNote(Note updatedNote) {
-    final int noteIndex =
-        _notes.indexWhere((note) => note.id == updatedNote.id);
-    if (noteIndex >= 0) {
-      _notes[noteIndex] = updatedNote; // Replace the old note
-      notifyListeners();
-    } else {
-      print('Note not found, unable to update.');
-    }
-  }
+  // Future<void> updateNote(Note updatedNote) async {
+  //   await _firestore.collection('notes').doc(updatedNote.id).update({
+  //     'title': updatedNote.title,
+  //     'content': updatedNote.content,
+  //     'dateModified': Timestamp.now(),
+  //   });
+  //   await fetchNotes(); // Refresh notes after updating
+  // }
 
   // void deleteNote(Note noteToDelete) {
   //   _notes.removeWhere((note) => note.id == noteToDelete.id);
