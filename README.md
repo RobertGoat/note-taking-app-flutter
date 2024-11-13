@@ -74,7 +74,7 @@ Follow these steps to set up and run the app on your local machine:
 1. **Clone the repository**:
     ```bash
     git clone https://github.com/RobertGoat/note-taking-app-flutter.git
-    cd note-taking-app
+    cd note-taking-app-flutter
     ```
 
 2. **Install dependencies**:
